@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Foods.Models;
+namespace Foods;
 
 public partial class Food
 {
-    public Guid FoodId { get; set; }
+    public Guid Id { get; set; }
 
     public string FoodName { get; set; } = null!;
 
@@ -13,11 +13,15 @@ public partial class Food
 
     public decimal FoodPrice { get; set; }
 
-    public DateTime? FoodLastCreated { get; set; }
+    public DateTimeOffset? DateTimeCreated { get; set; }
 
-    public DateTime? FoodLastUpdated { get; set; }
+    public DateTimeOffset? DateTimeUpdated { get; set; }
 
-    public bool? FoodIsDeleted { get; set; }
+    public bool? IsDeleted { get; set; }
+
+    public Guid StallId { get; set; }
 
     public virtual ICollection<FoodsCustomization> FoodsCustomizations { get; set; } = new List<FoodsCustomization>();
+
+    public virtual Stall Stall { get; set; } = null!;
 }

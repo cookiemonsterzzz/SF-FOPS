@@ -1,5 +1,4 @@
 ﻿using Foods.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foods.Controllers
@@ -10,7 +9,7 @@ namespace Foods.Controllers
     {
         private readonly IFoodService _foodService;
 
-        public FoodsController(IFoodService foodService) 
+        public FoodsController(IFoodService foodService)
         {
             _foodService = foodService;
         }
@@ -19,7 +18,7 @@ namespace Foods.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Food>>> GetAllFoods()
         {
-            return await _foodService.GetAllFoods(); 
+            return await _foodService.GetAllFoods();
         }
 
         [Route("GetSingleFood")]

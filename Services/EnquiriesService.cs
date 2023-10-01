@@ -1,34 +1,33 @@
-﻿using Foods.Data;
-using Foods.Interfaces;
+﻿using Foods.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Foods.Services
 {
     public class EnquiriesService : IEnquiriesService
     {
-        private List<Enquiries> enquiriesList = new List<Enquiries>();
+        private List<CustomerEnquiry> enquiriesList = new List<CustomerEnquiry>();
 
-        private readonly FopsContext _context;
+        private readonly SeniorFoodOrderSystemDatabaseContext _context;
 
-        public EnquiriesService(FopsContext context)
+        public EnquiriesService(SeniorFoodOrderSystemDatabaseContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Enquiries>> GetAllEnquiries()
+        public async Task<List<CustomerEnquiry>> GetAllEnquiries()
         {
             var allEnquiriesList = await _context.CustomerEnquiries.ToListAsync();
             return allEnquiriesList;
         }
 
-        public async Task<List<Enquiries>> AddEnquiries(Enquiries enquiries)
+        public async Task<List<CustomerEnquiry>> AddEnquiries(CustomerEnquiry enquiries)
         {
             _context.CustomerEnquiries.Add(enquiries);
             await _context.SaveChangesAsync();
             return enquiriesList;
         }
 
-        public async Task<Enquiries?> GetSingleEnquiries(Guid enquiryId, Guid customerId)
+        public async Task<CustomerEnquiry?> GetSingleEnquiries(Guid enquiryId, Guid customerId)
         {
             var singleEnquiry = await _context.CustomerEnquiries.FindAsync(enquiryId);
             if (singleEnquiry is null)

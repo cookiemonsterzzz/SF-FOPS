@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Foods.Models;
+namespace Foods;
 
-public partial class Enquiries
+public partial class CustomerEnquiry
 {
-    public Guid EnquiriesId { get; set; }
+    public Guid Id { get; set; }
 
     public string EnquiriesSubject { get; set; } = null!;
 
     public string EnquiriesDescription { get; set; } = null!;
 
-    public DateTime? EnquiriesLastCreated { get; set; }
+    public DateTimeOffset? DateTimeCreated { get; set; }
 
-    public DateTime? EnquiriesLastUpdated { get; set; }
+    public DateTimeOffset? DateTimeUpdated { get; set; }
 
-    public bool? EnquiriesIsDeleted { get; set; }
+    public bool? IsDeleted { get; set; }
 
-    public Guid CustomerId { get; set; }
+    public Guid UserId { get; set; }
 
-    public virtual Customer Customer { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

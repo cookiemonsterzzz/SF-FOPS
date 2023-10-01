@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Foods.Models;
+namespace Foods;
 
 public partial class FoodsCustomization
 {
-    public Guid FoodCustomizationId { get; set; }
+    public Guid Id { get; set; }
 
     public string FoodCustomizationName { get; set; } = null!;
 
     public decimal FoodCustomizationPrice { get; set; }
 
-    public DateTime? FoodCustomizationLastCreated { get; set; }
+    public DateTimeOffset? DateTimeCreated { get; set; }
 
-    public DateTime? FoodCustomizationLastUpdated { get; set; }
+    public DateTimeOffset? DateTimeUpdated { get; set; }
 
-    public bool? FoodCustomizationIsDeleted { get; set; }
+    public bool? IsDeleted { get; set; }
 
     public Guid FoodId { get; set; }
 

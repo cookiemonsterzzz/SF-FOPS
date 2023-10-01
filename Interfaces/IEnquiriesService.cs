@@ -2,10 +2,10 @@
 {
     public interface IEnquiriesService
     {
-        Task<List<Enquiries>> GetAllEnquiries();
+        Task<List<CustomerEnquiry>> GetAllEnquiries();
 
-        Task<List<Enquiries>> AddEnquiries(Enquiries enquiries);
+        Task<List<CustomerEnquiry>> AddEnquiries(CustomerEnquiry enquiries);
 
-        Task<Enquiries?> GetSingleEnquiries(Guid enquiryId, Guid customerId);
+        Task<CustomerEnquiry?> GetSingleEnquiries(Guid enquiryId, Guid customerId);
     }
 }

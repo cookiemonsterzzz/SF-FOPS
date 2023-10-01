@@ -1,5 +1,4 @@
 ﻿using Foods.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Foods.Controllers
@@ -17,7 +16,7 @@ namespace Foods.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<Enquiries>>> GetAllEnquiries()
+        public async Task<ActionResult<List<CustomerEnquiry>>> GetAllEnquiries()
         {
             var result = await _enquiriesService.GetAllEnquiries();
             return Ok(result);
@@ -25,7 +24,7 @@ namespace Foods.Controllers
 
         [Route("GetSingleEnquiries")]
         [HttpPost]
-        public async Task<ActionResult<List<Enquiries>>?> GetSingleEnquiries(Guid enquiryId, Guid customerId)
+        public async Task<ActionResult<List<CustomerEnquiry>>?> GetSingleEnquiries(Guid enquiryId, Guid customerId)
         {
             var result = await _enquiriesService.GetSingleEnquiries(enquiryId, customerId);
             if (result is null)
@@ -40,7 +39,7 @@ namespace Foods.Controllers
 
         [Route("AddEnquiries")]
         [HttpPost]
-        public async Task<ActionResult<List<Enquiries>>> AddEnquiries(Enquiries enquiries)
+        public async Task<ActionResult<List<CustomerEnquiry>>> AddEnquiries(CustomerEnquiry enquiries)
         {
             var result = await _enquiriesService.AddEnquiries(enquiries);
             return Ok(result);

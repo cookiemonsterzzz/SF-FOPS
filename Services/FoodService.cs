@@ -1,5 +1,4 @@
-﻿using Foods.Data;
-using Foods.Interfaces;
+﻿using Foods.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Foods.Services
@@ -8,9 +7,9 @@ namespace Foods.Services
     {
         private List<Food> foodList = new List<Food>();
 
-        private readonly FopsContext _context;
+        private readonly SeniorFoodOrderSystemDatabaseContext _context;
 
-        public FoodService(FopsContext context)
+        public FoodService(SeniorFoodOrderSystemDatabaseContext context)
         {
             _context = context;
         }
@@ -68,7 +67,7 @@ namespace Foods.Services
             {
                 singleFood.FoodName = request.FoodName;
                 singleFood.FoodPrice = request.FoodPrice;
-                singleFood.FoodLastUpdated = DateTime.Now;
+                singleFood.DateTimeUpdated = DateTime.Now;
                 singleFood.FoodDescription = request.FoodDescription;
 
                 await _context.SaveChangesAsync();
