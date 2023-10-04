@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../buildMultiTargeting/SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.props" />
+</Project>
