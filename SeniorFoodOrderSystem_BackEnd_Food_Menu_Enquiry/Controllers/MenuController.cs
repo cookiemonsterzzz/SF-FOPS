@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
@@ -12,6 +11,10 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
     public class MenuController : Controller
     {
         private readonly SeniorFoodOrderSystemDatabaseContext _context;
+        private Dictionary<Guid, int> _stallOrderCountDict = new();
+        private Dictionary<Guid, int> _stallRatingsDict = new();
+        private Dictionary<Guid, Dictionary<string, FoodCustomizationDto>> _foodCustomizationsDict = new();
+        private Dictionary<Guid, List<FoodDto>> _stallFoodsDict = new();
 
         public MenuController(SeniorFoodOrderSystemDatabaseContext context)
         {
@@ -23,58 +26,122 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
         public async Task<ActionResult<List<MenuDto>>> GetMenu()
         {
             var userId = await GetUserIdByToken();
-
-            var stalls = await _context.Stalls
-                .Include(x => x.StallRatings)
-                .ToListAsync();
+            _stallOrderCountDict = await GetStallOrderCountByUserId(userId);
+            _foodCustomizationsDict = await LoadFoodCustomizations();
+            _stallFoodsDict = await LoadStallFoods();
+            var stalls = await GetStallsWithRatingsAndFoods();
 
             if (stalls == null || stalls.Count == 0)
             {
                 return NotFound("No stalls found.");
             }
 
-            var menuList = stalls.Select(stall => new MenuDto
-            {
-                stallId = stall.Id,
-                stallName = stall.StallName,
-                rating = stall.StallRatings?.FirstOrDefault(rating => rating.StallId == stall.Id)?.Rating ?? 0,
-                foods = _context.Foods
-                    .Where(food => food.StallId == stall.Id)
-                    .Select(food => new FoodDto
-                    {
-                        foodName = food.FoodName,
-                        price = food.FoodPrice,
-                        image = "",
-                        foodCustomization = _context.FoodsCustomizations
-                            .Where(customization => customization.FoodId == food.Id)
-                            .Select(customization => new FoodCustomizationDto
-                            {
-                                name = customization.FoodCustomizationName,
-                                price = customization.FoodCustomizationPrice,
-                            }).ToList()
-                    }).ToList()
-            }).ToList();
+            var menuList = BuildMenuList(stalls, userId);
 
             if (menuList == null || menuList.Count == 0)
             {
                 return NotFound("Menu not found.");
             }
 
-            menuList = userId is not null
-                ? menuList.OrderByDescending(menu => CalculateOrderHistoryScore(menu.stallId, (Guid)userId)).ToList()
-                : menuList.ToList();
-
             return Ok(menuList);
         }
 
-        private async Task<double> CalculateOrderHistoryScore(Guid stallId, Guid userId)
+        private async Task<Dictionary<Guid, int>> GetStallOrderCountByUserId(Guid? userId)
         {
-            // Get all orders for the given stallId
-            var numberOfOrdersInThisStall = await _context.Orders
-                .Where(o => o.StallId == stallId && o.UserId == userId)
-                .CountAsync();
+            var result = await _context.Orders
+                .Where(o => o.UserId == userId)
+                .GroupBy(o => o.StallId)
+                .ToListAsync();
+            return result.ToDictionary(g => g.Key, g => g.Count());
+        }
 
-            return numberOfOrdersInThisStall;
+        private async Task<List<Stall>> GetStallsWithRatingsAndFoods()
+        {
+            // Fetch all stalls with ratings from the database
+            var stallsWithRatings = await _context.Stalls
+                .Include(x => x.StallRatings)
+                .ToListAsync();
+
+            // Filter stalls that have associated food items in the _stallFoodsDict
+            var stallsWithFoods = stallsWithRatings
+                .Where(stall => _stallFoodsDict.ContainsKey(stall.Id))
+                .ToList();
+
+            return stallsWithFoods;
+        }
+
+        private List<MenuDto> BuildMenuList(List<Stall> stalls, Guid? userId)
+        {
+            var menuList = stalls.Select(stall => new MenuDto
+            {
+                stallId = stall.Id,
+                stallName = stall.StallName,
+                rating = GetStallRating(stall.Id),
+                foods = _stallFoodsDict.TryGetValue(stall.Id, out var foods)
+                        ? foods
+                        : new List<FoodDto>()
+            }).ToList();
+
+            if (userId != null)
+            {
+                menuList = menuList
+                    .OrderByDescending(menu => GetStallOrderCount(menu.stallId))
+                    .ThenByDescending(menu => menu.rating)
+                    .ToList();
+            }
+
+            return menuList;
+        }
+
+        private int GetStallOrderCount(Guid stallId)
+        {
+            return _stallOrderCountDict.TryGetValue(stallId, out var count) ? count : 0;
+        }
+
+        private int GetStallRating(Guid stallId)
+        {
+            return _stallRatingsDict.TryGetValue(stallId, out var rating) ? rating : 0;
+        }
+
+        private async Task<Dictionary<Guid, List<FoodDto>>> LoadStallFoods()
+        {
+            var result = await _context.Foods
+                .GroupBy(food => food.StallId)
+                .ToListAsync();
+
+            var stallFoodsDictionary = result.ToDictionary(
+                    group => group.Key,
+                    group => group.Select(food => new FoodDto
+                    {
+                        foodName = food.FoodName,
+                        price = food.FoodPrice,
+                        image = "",
+                        foodCustomization = _foodCustomizationsDict.TryGetValue(food.Id, out var customizations)
+                            ? customizations.Values.ToList()
+                            : new List<FoodCustomizationDto>()
+                    }).ToList()
+                );
+
+            return stallFoodsDictionary;
+        }
+
+        private async Task<Dictionary<Guid, Dictionary<string, FoodCustomizationDto>>> LoadFoodCustomizations()
+        {
+            var result = await _context.FoodsCustomizations
+                .GroupBy(customization => customization.FoodId)
+                .ToListAsync();
+
+            return result.ToDictionary(
+                  group => group.Key,
+                  group => group.ToDictionary(
+                      customization => customization.FoodCustomizationName,
+                      customization => new FoodCustomizationDto
+                      {
+                          name = customization.FoodCustomizationName,
+                          price = customization.FoodCustomizationPrice,
+                      }
+                  )
+              );
         }
 
         private async Task<Guid?> GetUserIdByToken()
@@ -87,7 +154,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
 
             if (jsonToken != null)
             {
-                var phoneNo = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "PhoneNO")?.Value;
+                var phoneNo = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "PhoneNo")?.Value;
                 var user = await _context.Users.FirstOrDefaultAsync(x => x.PhoneNo == phoneNo);
                 if (user is not null)
                 {

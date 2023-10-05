@@ -1,17 +1,21 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+using SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<SeniorFoodOrderSystemDatabaseContext>(
+    (options) => options.UseSqlServer("ConnectionStrings:DefaultConnection"));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigins",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000")  // Replace with your frontend's domain
+            builder.AllowAnyOrigin()  // Replace with your frontend's domain
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
