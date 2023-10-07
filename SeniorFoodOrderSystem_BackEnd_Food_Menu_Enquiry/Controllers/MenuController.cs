@@ -36,6 +36,8 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
                 return NotFound("No stalls found.");
             }
 
+            _stallRatingsDict = await GetAverageRatingsDictionary(stalls); // Get average ratings
+
             var menuList = BuildMenuList(stalls, userId);
 
             if (menuList == null || menuList.Count == 0)
@@ -78,7 +80,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
                 stallName = stall.StallName,
                 rating = GetStallRating(stall.Id),
                 foods = _stallFoodsDict.TryGetValue(stall.Id, out var foods)
-                        ? foods
+                        ? foods.OrderBy(x => x.foodName).ToList()
                         : new List<FoodDto>()
             }).ToList();
 
@@ -162,6 +164,31 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
                 }
             }
             return null;
+        }
+
+        private async Task<Dictionary<Guid, int>> GetAverageRatingsDictionary(List<Stall> stalls)
+        {
+            var averageRatingsDict = new Dictionary<Guid, int>();
+
+            foreach (var stall in stalls)
+            {
+                var ratings = await _context.StallRatings
+                    .Where(sr => sr.StallId == stall.Id)
+                    .Select(sr => sr.Rating)
+                    .ToListAsync();
+
+                if (ratings.Any())
+                {
+                    int averageRating = (int)Math.Abs(ratings.Average());
+                    averageRatingsDict[stall.Id] = averageRating;
+                }
+                else
+                {
+                    // Set default rating to 0 if no ratings are available
+                    averageRatingsDict[stall.Id] = 5;
+                }
+            }
+            return averageRatingsDict;
         }
     }
 }

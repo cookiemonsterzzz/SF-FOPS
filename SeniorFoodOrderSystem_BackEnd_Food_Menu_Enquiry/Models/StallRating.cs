@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
+﻿namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
 
 public partial class StallRating
 {

@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  seniorfoodordersystem_backend_food_menu_enquiry:
+    image: ${DOCKER_REGISTRY-}seniorfoodordersystembackendfoodmenuenquiry
+    build:
+      context: .
+      dockerfile: SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry/Dockerfile
