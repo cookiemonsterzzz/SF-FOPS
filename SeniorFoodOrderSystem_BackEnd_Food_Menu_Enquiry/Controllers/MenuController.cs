@@ -117,7 +117,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
                     {
                         foodName = food.FoodName,
                         price = food.FoodPrice,
-                        image = "",
+                        image = food.FoodDescription ?? string.Empty,
                         foodCustomization = _foodCustomizationsDict.TryGetValue(food.Id, out var customizations)
                             ? customizations.Values.ToList()
                             : new List<FoodCustomizationDto>()
