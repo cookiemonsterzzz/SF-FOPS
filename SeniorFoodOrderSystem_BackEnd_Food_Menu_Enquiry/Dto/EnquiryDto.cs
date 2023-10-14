@@ -2,8 +2,8 @@
 {
     public class EnquiryDto
     {
-        public string EnquirySubject { get; set; } = string.Empty;
+        public string EnquiriesSubject { get; set; } = string.Empty;
 
-        public string EnquiryDescription { get; set; } = string.Empty;
+        public string EnquiriesDescription { get; set; } = string.Empty;
     }
 }
