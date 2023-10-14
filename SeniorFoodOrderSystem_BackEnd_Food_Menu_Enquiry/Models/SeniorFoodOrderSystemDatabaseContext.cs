@@ -59,13 +59,13 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.DateTimeCreated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.DateTimeUpdated).HasDefaultValueSql("(getdate())");
-            entity.Property(e => e.FoodDescription)
-                .HasMaxLength(5000)
-                .IsUnicode(false);
             entity.Property(e => e.FoodName)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.FoodPrice).HasColumnType("decimal(11, 2)");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(2000)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.Stall).WithMany(p => p.Foods)
                 .HasForeignKey(d => d.StallId)
@@ -173,6 +173,11 @@ public partial class SeniorFoodOrderSystemDatabaseContext : DbContext
             entity.Property(e => e.DateTimeCreated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.DateTimeUpdated).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Review).HasMaxLength(1000);
+
+            entity.HasOne(d => d.Order).WithMany(p => p.StallRatings)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StallRating_Order");
 
             entity.HasOne(d => d.Stall).WithMany(p => p.StallRatings)
                 .HasForeignKey(d => d.StallId)

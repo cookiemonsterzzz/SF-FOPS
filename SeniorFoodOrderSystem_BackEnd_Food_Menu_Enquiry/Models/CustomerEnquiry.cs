@@ -1,12 +1,15 @@
-﻿namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
 
 public partial class CustomerEnquiry
 {
     public Guid Id { get; set; }
 
-    public string EnquiriesSubject { get; set; } = string.Empty;
+    public string EnquiriesSubject { get; set; } = null!;
 
-    public string EnquiriesDescription { get; set; } = string.Empty;
+    public string EnquiriesDescription { get; set; } = null!;
 
     public DateTimeOffset? DateTimeCreated { get; set; }
 
