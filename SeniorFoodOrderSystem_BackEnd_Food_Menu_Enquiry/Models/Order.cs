@@ -37,5 +37,7 @@ public partial class Order
 
     public virtual Stall Stall { get; set; } = null!;
 
+    public virtual ICollection<StallRating> StallRatings { get; set; } = new List<StallRating>();
+
     public virtual User User { get; set; } = null!;
 }

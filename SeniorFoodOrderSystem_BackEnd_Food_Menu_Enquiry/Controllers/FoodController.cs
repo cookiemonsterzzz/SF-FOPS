@@ -58,7 +58,7 @@ namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry.Controllers
                 singleFood.FoodName = request.FoodName;
                 singleFood.FoodPrice = request.FoodPrice;
                 singleFood.DateTimeUpdated = DateTime.Now;
-                singleFood.FoodDescription = request.FoodDescription;
+                singleFood.ImageUrl = request.ImageUrl;
 
                 await _context.SaveChangesAsync();
 

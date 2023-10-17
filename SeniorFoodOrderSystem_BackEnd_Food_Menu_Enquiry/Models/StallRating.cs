@@ -1,8 +1,13 @@
-﻿namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
+﻿using System;
+using System.Collections.Generic;
+
+namespace SeniorFoodOrderSystem_BackEnd_Food_Menu_Enquiry;
 
 public partial class StallRating
 {
     public Guid Id { get; set; }
+
+    public Guid OrderId { get; set; }
 
     public Guid StallId { get; set; }
 
@@ -15,6 +20,8 @@ public partial class StallRating
     public DateTimeOffset? DateTimeCreated { get; set; }
 
     public DateTimeOffset? DateTimeUpdated { get; set; }
+
+    public virtual Order Order { get; set; } = null!;
 
     public virtual Stall Stall { get; set; } = null!;
 
